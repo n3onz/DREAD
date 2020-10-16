@@ -26,4 +26,4 @@ Our project focuses on cryptocurrency and the dark web, along with tracking ille
 
 ## Product Owners
 
-* New York Police Deprartment
+* New York Police Department
