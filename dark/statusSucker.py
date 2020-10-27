@@ -11,10 +11,15 @@ nlp = English()
 websites = [x.strip('\n') for x in open(sys.argv[1],'r').read().split(',')]
 products = []
 
+session = requests.session()
+session.proxies = {}
+session.proxies['http'] = 'socks5h://localhost:9050'
+session.proxies['https'] = 'socks5h://localhost:9050'
+
 #For all websites it connects via requests and parses for title, status code, and notes the date/time of when this occurs
 #Appends above to output list
 for site in websites:
-    r = requests.get(site)
+    r = session.get(site)
     t = r.text
     soup = BeautifulSoup(t, features = "html.parser")
     title = soup.title.string #Gets title from HTML
