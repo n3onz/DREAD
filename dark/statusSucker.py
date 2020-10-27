@@ -1,5 +1,6 @@
 #all of the imports required for this script
 import requests
+import csv
 import sys
 from bs4 import BeautifulSoup
 import datetime
@@ -11,6 +12,25 @@ nlp = English()
 websites = [x.strip('\n') for x in open(sys.argv[1],'r').read().split(',')]
 products = []
 
+#Creates dictionary of keywords for CSV
+fields = []
+rows = []
+with open(sys.argv[2], 'r') as csvfile:
+    csvreader = csv.reader(csvfile)
+
+    fields = next(csvreader)
+
+    keywords = {}
+
+    for row in csvreader:
+        d = row
+        if '' in d: #removes trailing white space
+            index = d.index('')
+            d = d[0:index]
+        k = [x.lower() for x in d] #sets all of dictionary values to be lowercase
+        keywords[row[0]] = k
+
+#Establishes TOR Proxy
 session = requests.session()
 session.proxies = {}
 session.proxies['http'] = 'socks5h://localhost:9050'
@@ -34,7 +54,15 @@ for site in websites:
     #Gets status code and datetime
     sc = r.status_code
     dt = datetime.datetime.now()
-    products.append('{}:{}:{}:{}\n'.format(site,sc,title,dt))
+    #Parses tokens for keywords
+    categories = []
+    for cats in keywords:
+        for i in token_list:
+            if i.lower() in keywords.get(cats):
+                if (cats not in categories):
+                    categories.append(cats)
+
+    products.append('{}:{}:{}:{}:{}\n'.format(site,sc,title,categories,dt))
 
 out = ','.join(products)+'\n'
 
